@@ -1,0 +1,42 @@
+name: Deploy Prestashop
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  DOMAIN: ${{ vars.DOMAIN }}
+  NETWORK_NAME: ${{ vars.NETWORK_NAME }}
+  MYSQL_DATABASE: ${{ vars.MYSQL_DATABASE }}
+  MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+  DB_NAME: ${{ vars.DB_NAME }}
+  DB_USER: ${{ vars.DB_USER }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+
+jobs: 
+  deploy:
+    name: Deploy on self-hosted runner
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Stop & Remove Containers
+        run: |
+          echo "Stopping and removing containers..."
+          docker-compose down
+
+      - name: Prune Unused Docker Volumes
+        run: |
+          echo "Pruning unused Docker volumes..."
+          docker volume prune -f
+
+      - name: Build & Start Containers
+        run: |
+          echo "Building and starting Docker containers..."
+          docker-compose up -d --build
+
+      - name: Show Running Containers
+        run: docker ps -a
