@@ -27,9 +27,17 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik
+
+      - traefik.http.routers.${NETWORK_NAME}-http.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.${NETWORK_NAME}-http.entrypoints=web
+      - traefik.http.middlewares.${NETWORK_NAME}-redir.redirectscheme.scheme=https
+      - traefik.http.middlewares.${NETWORK_NAME}-redir.redirectscheme.permanent=true
+      - traefik.http.routers.${NETWORK_NAME}-http.middlewares=${NETWORK_NAME}-redir@docker
+
       - traefik.http.routers.${NETWORK_NAME}.rule=Host(`${DOMAIN}`)
       - traefik.http.routers.${NETWORK_NAME}.entrypoints=websecure
       - traefik.http.routers.${NETWORK_NAME}.tls.certresolver=myresolver
+
       - traefik.http.services.${NETWORK_NAME}-svc.loadbalancer.server.port=80
     networks:
       - default_net
