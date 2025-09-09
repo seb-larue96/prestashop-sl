@@ -35,6 +35,14 @@ jobs:
           echo "Pruning unused Docker volumes..."
           docker volume prune -f
 
+      - name: Create Docker Network if needed
+        run: |
+          if ! docker network ls --filter name=^${{ vars.NETWORK_NAME }}$ --quiet; then
+            docker network create ${{ vars.NETWORK_NAME }}
+          else
+            echo "Docker network ${{ vars.NETWORK_NAME }} already exists"
+          fi
+
       - name: Build & Start Containers
         run: |
           echo "Building and starting Docker containers..."
