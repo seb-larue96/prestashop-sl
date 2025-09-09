@@ -27,6 +27,7 @@ jobs:
       - name: Stop & Remove Containers
         run: |
           echo "Stopping and removing containers..."
+          set -e
           docker-compose down
 
       - name: Prune Unused Docker Volumes
@@ -37,6 +38,7 @@ jobs:
       - name: Build & Start Containers
         run: |
           echo "Building and starting Docker containers..."
+          set -e
           docker-compose up -d --build
 
       - name: Show Running Containers
