@@ -5,15 +5,6 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
-env:
-  DOMAIN: ${{ vars.DOMAIN }}
-  NETWORK_NAME: ${{ vars.NETWORK_NAME }}
-  MYSQL_DATABASE: ${{ vars.MYSQL_DATABASE }}
-  MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
-  DB_NAME: ${{ vars.DB_NAME }}
-  DB_USER: ${{ vars.DB_USER }}
-  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-
 jobs: 
   deploy:
     name: Deploy on self-hosted runner
@@ -22,6 +13,16 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+
+      - name: Create .env File from GitHub Secrets and Variables
+        run: |
+          echo "DOMAIN=${{ vars.DOMAIN }}" >> .env
+          echo "NETWORK_NAME=${{ vars.NETWORK_NAME }}" >> .env
+          echo "MYSQL_DATABASE=${{ vars.MYSQL_DATABASE }}" >> .env
+          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env
+          echo "DB_NAME=${{ vars.DB_NAME }}" >> .env
+          echo "DB_USER=${{ vars.DB_USER }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
 
       - name: Stop & Remove Containers
         run: |
