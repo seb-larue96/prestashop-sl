@@ -24,39 +24,16 @@ services:
       DB_PASSWORDD: ${DB_PASSWORD}
     volumes:
       - ps_data:/var/www/html
-    networks:
-      - default_net
-  nginx:
-    container_name: nginx-${NETWORK_NAME}
-    image: nginx:latest
-    depends_on: 
-      - prestashop
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-    networks:
-      - default_net
-      - traefik
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik
-
-      # -------- HTTP (80) -> HTTPS redirect for /web only --------
-      - traefik.http.routers.${NETWORK_NAME}-http.rule=Host(`${DOMAIN}`)
-      - traefik.http.routers.${NETWORK_NAME}-http.entrypoints=web
-      - traefik.http.routers.${NETWORK_NAME}-http.priority=100
-      - traefik.http.middlewares.${NETWORK_NAME}-redir.redirectscheme.scheme=https
-      - traefik.http.middlewares.${NETWORK_NAME}-redir.redirectscheme.permanent=true
-      - traefik.http.routers.${NETWORK_NAME}-http.middlewares=${NETWORK_NAME}-redir@docker
-
-      # -------- HTTPS router for /web --------
       - traefik.http.routers.${NETWORK_NAME}.rule=Host(`${DOMAIN}`)
       - traefik.http.routers.${NETWORK_NAME}.entrypoints=websecure
       - traefik.http.routers.${NETWORK_NAME}.tls.certresolver=myresolver
-      - traefik.http.routers.${NETWORK_NAME}.priority=100
-
-      # Service points to nginx (port 80 in this container)
       - traefik.http.services.${NETWORK_NAME}-svc.loadbalancer.server.port=80
-    restart: unless-stopped
+    networks:
+      - default_net
+      - traefik
 
 volumes:
   db_data:
